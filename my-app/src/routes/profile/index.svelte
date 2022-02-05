@@ -3,13 +3,13 @@
 
 	// see https://kit.svelte.dev/docs#loading
 	export const load = async ({ fetch }) => {
-		const res = await fetch('/todos.json');
+		const res = await fetch('/profile.json');
 
 		if (res.ok) {
-			const todos = await res.json();
+			const profile = await res.json();
 
 			return {
-				props: { todos }
+				props: { profile }
 			};
 		}
 
@@ -25,12 +25,12 @@
 	import { scale } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
-	export let todos;
+	export let profile;
 
 	async function patch(res) {
 		const todo = await res.json();
 
-		todos = todos.map((t) => {
+		profile = profile.map((t) => {
 			if (t.uid === todo.uid) return todo;
 			return t;
 		});
@@ -38,20 +38,20 @@
 </script>
 
 <svelte:head>
-	<title>Todos</title>
+	<title>Profile</title>
 </svelte:head>
 
-<div class="todos">
-	<h1>Todos</h1>
+<div class="profile">
+	<h1>Profil</h1>
 
 	<form
 		class="new"
-		action="/todos.json"
+		action="/profile.json"
 		method="post"
 		use:enhance={{
 			result: async (res, form) => {
 				const created = await res.json();
-				todos = [...todos, created];
+				profile = [...profile, created];
 
 				form.reset();
 			}
@@ -60,7 +60,7 @@
 		<input name="text" aria-label="Add todo" placeholder="+ tap to add a todo" />
 	</form>
 
-	{#each todos as todo (todo.uid)}
+	{#each profile as todo (todo.uid)}
 		<div
 			class="todo"
 			class:done={todo.done}
@@ -68,7 +68,7 @@
 			animate:flip={{ duration: 200 }}
 		>
 			<form
-				action="/todos/{todo.uid}.json?_method=PATCH"
+				action="/profile/{todo.uid}.json?_method=PATCH"
 				method="post"
 				use:enhance={{
 					pending: (data) => {
@@ -83,7 +83,7 @@
 
 			<form
 				class="text"
-				action="/todos/{todo.uid}.json?_method=PATCH"
+				action="/profile/{todo.uid}.json?_method=PATCH"
 				method="post"
 				use:enhance={{
 					result: patch
@@ -94,12 +94,12 @@
 			</form>
 
 			<form
-				action="/todos/{todo.uid}.json?_method=DELETE"
+				action="/profile/{todo.uid}.json?_method=DELETE"
 				method="post"
 				use:enhance={{
 					pending: () => (todo.pending_delete = true),
 					result: () => {
-						todos = todos.filter((t) => t.uid !== todo.uid);
+						profile = profile.filter((t) => t.uid !== todo.uid);
 					}
 				}}
 			>
@@ -110,7 +110,7 @@
 </div>
 
 <style>
-	.todos {
+	.profile {
 		width: 100%;
 		max-width: var(--column-width);
 		margin: var(--column-margin-top) auto 0 auto;
